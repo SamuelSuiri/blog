@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, getPostBySlug } from '../../lib/wp';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { slug: post.slug }
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug as string);
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+const postDate = new Date(post.date).toLocaleDateString('es-ES', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<BaseLayout title={`${post.title.rendered} — Samuel Suiri`}>
+  <article class="single-post">
+    <header class="post-header">
+      <time datetime={post.date}>{postDate}</time>
+      <h1 set:html={post.title.rendered} />
+    </header>
+
+    {featuredImage && (
+      <img src={featuredImage} alt={post.title.rendered} class="hero-image" />
+    )}
+
+    <div class="content" set:html={post.content.rendered} />
+
+    <nav class="back-nav">
+      <a href="/">&larr; Volver al listado</a>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .single-post {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .post-header time {
+    font-size: 0.9rem;
+    color: #8b949e;
+  }
+  .post-header h1 {
+    font-size: 2.25rem;
+    color: var(--color-heading);
+    margin-top: 0.5rem;
+    line-height: 1.25;
+  }
+  .hero-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .content {
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+  .content :global(p) {
+    margin-bottom: 1.25rem;
+  }
+  .content :global(h2),
+  .content :global(h3) {
+    color: var(--color-heading);
+    margin: 2rem 0 1rem 0;
+  }
+  .content :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+  }
+  .content :global(blockquote) {
+    border-left: 4px solid var(--color-accent);
+    padding-left: 1rem;
+    color: #8b949e;
+    margin: 1.5rem 0;
+  }
+  .back-nav {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+</style>
