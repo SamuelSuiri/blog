@@ -3,7 +3,6 @@
   "name": "samsuiri-blog",
   "compatibility_date": "2026-10-31",
   "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS"
+    "directory": "./dist"
   }
 }
