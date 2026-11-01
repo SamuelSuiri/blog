@@ -23,7 +23,8 @@ const { page } = Astro.props;
 
   <section class="posts-list">
     {page.data.map((post) => {
-      const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      const featuredImage = post.featured_image_url || post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      const featuredAlt = post.featured_image_alt || post.title.rendered;
       const postDate = new Date(post.date).toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
@@ -34,7 +35,7 @@ const { page } = Astro.props;
         <article class="post-card">
           {featuredImage && (
             <a href={`/posts/${post.slug}`}>
-              <img src={featuredImage} alt={post.title.rendered} class="post-thumb" loading="lazy" />
+              <img src={featuredImage} alt={featuredAlt} class="post-thumb" loading="lazy" />
             </a>
           )}
           <div class="post-info">

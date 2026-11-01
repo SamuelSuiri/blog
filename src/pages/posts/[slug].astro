@@ -27,7 +27,8 @@ const { post, allPosts } = Astro.props;
 
 const relatedPosts = getRelatedPosts(post, allPosts, 4);
 
-const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+const featuredImage = post.featured_image_url || post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+const featuredAlt = post.featured_image_alt || post.title.rendered;
 const postDate = new Date(post.date).toLocaleDateString('es-ES', {
   year: 'numeric',
   month: 'long',
@@ -43,7 +44,7 @@ const postDate = new Date(post.date).toLocaleDateString('es-ES', {
     </header>
 
     {featuredImage && (
-      <img src={featuredImage} alt={post.title.rendered} class="hero-image" />
+      <img src={featuredImage} alt={featuredAlt} class="hero-image" />
     )}
 
     <div class="content" set:html={post.content.rendered} />
@@ -54,10 +55,10 @@ const postDate = new Date(post.date).toLocaleDateString('es-ES', {
         <h2>Entradas Relacionadas</h2>
         <div class="related-grid">
           {relatedPosts.map((rel) => {
-            const relImg = rel._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+            const relImg = rel.featured_image_url || rel._embedded?.['wp:featuredmedia']?.[0]?.source_url;
             return (
               <a href={`/posts/${rel.slug}`} class="related-card">
-                {relImg && <img src={relImg} alt={rel.title.rendered} class="related-thumb" loading="lazy" />}
+                {relImg && <img src={relImg} alt={rel.featured_image_alt || rel.title.rendered} class="related-thumb" loading="lazy" />}
                 <div class="related-title" set:html={rel.title.rendered} />
               </a>
             );

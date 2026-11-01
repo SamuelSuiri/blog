@@ -10,6 +10,8 @@ export interface Post {
   title: { rendered: string };
   excerpt: { rendered: string };
   content: { rendered: string };
+  featured_image_url?: string | null;
+  featured_image_alt?: string | null;
   _embedded?: {
     'wp:featuredmedia'?: Array<{ source_url: string; alt_text?: string }>;
     'wp:term'?: Array<Array<{ id: number; name: string; slug: string }>>;
