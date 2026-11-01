@@ -6,7 +6,7 @@ interface Props {
   description?: string;
 }
 
-const { title, description = 'Blog y contenido de Samuel Suiri' } = Astro.props;
+const { title, description = 'Blog y contenidos de Samuel Suiri' } = Astro.props;
 ---
 
 <!doctype html>
@@ -24,8 +24,10 @@ const { title, description = 'Blog y contenido de Samuel Suiri' } = Astro.props;
         --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         --color-bg: #0d1117;
         --color-surface: #161b22;
+        --color-surface-hover: #1f242c;
         --color-border: #30363d;
         --color-text: #c9d1d9;
+        --color-text-muted: #8b949e;
         --color-heading: #f0f6fc;
         --color-accent: #58a6ff;
         --color-accent-hover: #79c0ff;
@@ -65,21 +67,62 @@ const { title, description = 'Blog y contenido de Samuel Suiri' } = Astro.props;
         font-weight: 700;
         color: var(--color-heading);
       }
-      main {
-        max-width: 860px;
+      .site-container {
+        max-width: 1200px;
         width: 100%;
         margin: 2rem auto;
         padding: 0 1.5rem;
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 2.5rem;
         flex: 1;
+      }
+      @media (max-width: 900px) {
+        .site-container {
+          grid-template-columns: 1fr;
+        }
+      }
+      .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .sidebar-widget {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 1.5rem;
+      }
+      .sidebar-widget h3 {
+        font-size: 1.1rem;
+        color: var(--color-heading);
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.5rem;
+      }
+      .sidebar-widget ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .sidebar-widget li a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-text);
+        font-size: 0.95rem;
+      }
+      .sidebar-widget li a:hover {
+        color: var(--color-accent);
       }
       footer {
         border-top: 1px solid var(--color-border);
         text-align: center;
         padding: 2rem;
         font-size: 0.875rem;
-        color: #8b949e;
+        color: var(--color-text-muted);
       }
-      /* View Transitions */
       @view-transition {
         navigation: auto;
       }
@@ -93,12 +136,63 @@ const { title, description = 'Blog y contenido de Samuel Suiri' } = Astro.props;
       </nav>
     </header>
 
-    <main>
-      <slot />
-    </main>
+    <div class="site-container">
+      <main>
+        <slot />
+      </main>
+
+      <aside class="sidebar">
+        <section class="sidebar-widget">
+          <h3>Proyectos & Ecosistema</h3>
+          <ul>
+            <li>
+              <a href="https://samsuiri.qd.je" target="_blank" rel="noopener noreferrer">
+                <span>🌐</span> Portal Principal (WP Core)
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/SamuelSuiri" target="_blank" rel="noopener noreferrer">
+                <span>💻</span> GitHub: SamuelSuiri
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/MundoSuiri" target="_blank" rel="noopener noreferrer">
+                <span>⚡</span> Org MundoSuiri
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/SamuelSuiri/blog" target="_blank" rel="noopener noreferrer">
+                <span>📦</span> Repositorio del Blog Headless
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="sidebar-widget">
+          <h3>Conexiones & Redes</h3>
+          <ul>
+            <li>
+              <a href="https://samsuiri.qd.je/@samuel" target="_blank" rel="me noopener noreferrer">
+                <span>🐘</span> Mastodon / Fediverse
+              </a>
+            </li>
+            <li>
+              <a href="https://astro.samsuiri.qd.je" target="_blank" rel="noopener noreferrer">
+                <span>☁️</span> Cloudflare Edge (astro)
+              </a>
+            </li>
+            <li>
+              <a href="https://ghp.samsuiri.qd.je" target="_blank" rel="noopener noreferrer">
+                <span>🐙</span> GitHub Pages Edge (ghp)
+              </a>
+            </li>
+          </ul>
+        </section>
+      </aside>
+    </div>
 
     <footer>
-      <p>&copy; {new Date().getFullYear()} Samuel Suiri. Headless WordPress + Astro Edge.</p>
+      <p>&copy; {new Date().getFullYear()} Samuel Suiri. Headless WordPress + Astro 7 Edge.</p>
     </footer>
   </body>
 </html>

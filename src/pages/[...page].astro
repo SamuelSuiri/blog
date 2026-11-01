@@ -1,0 +1,173 @@
+---
+import type { Page } from 'astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllPosts, type Post } from '../lib/wp';
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+  const posts = await getAllPosts();
+  return paginate(posts, { pageSize: 12 });
+}
+
+interface Props {
+  page: Page<Post>;
+}
+
+const { page } = Astro.props;
+---
+
+<BaseLayout title={`Blog — Samuel Suiri ${page.currentPage > 1 ? `(Página ${page.currentPage})` : ''}`}>
+  <section class="hero">
+    <h1>Bitácora y Publicaciones</h1>
+    <p class="subtitle">Artículos y notas sincronizadas desde el backend WordPress ({page.total} entradas en total).</p>
+  </section>
+
+  <section class="posts-list">
+    {page.data.map((post) => {
+      const featuredImage = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      const postDate = new Date(post.date).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      return (
+        <article class="post-card">
+          {featuredImage && (
+            <a href={`/posts/${post.slug}`}>
+              <img src={featuredImage} alt={post.title.rendered} class="post-thumb" loading="lazy" />
+            </a>
+          )}
+          <div class="post-info">
+            <time datetime={post.date}>{postDate}</time>
+            <h2>
+              <a href={`/posts/${post.slug}`} set:html={post.title.rendered} />
+            </h2>
+            <div class="excerpt" set:html={post.excerpt.rendered} />
+            <a href={`/posts/${post.slug}`} class="read-more">Leer artículo &rarr;</a>
+          </div>
+        </article>
+      );
+    })}
+  </section>
+
+  <!-- Paginación Numérica y Controles Prev/Next -->
+  <nav class="pagination-bar" aria-label="Navegación de páginas">
+    <div class="nav-links">
+      {page.url.prev ? (
+        <a href={page.url.prev} class="page-button">&larr; Anteriores</a>
+      ) : (
+        <span class="page-button disabled">&larr; Anteriores</span>
+      )}
+
+      <span class="page-status">
+        Página <strong>{page.currentPage}</strong> de <strong>{page.lastPage}</strong>
+      </span>
+
+      {page.url.next ? (
+        <a href={page.url.next} class="page-button">Siguientes &rarr;</a>
+      ) : (
+        <span class="page-button disabled">Siguientes &rarr;</span>
+      )}
+    </div>
+  </nav>
+</BaseLayout>
+
+<style>
+  .hero {
+    margin-bottom: 2.5rem;
+  }
+  .hero h1 {
+    font-size: 2.25rem;
+    color: var(--color-heading);
+    margin-bottom: 0.5rem;
+  }
+  .subtitle {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+  }
+  .posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+  .post-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+  }
+  .post-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+  .post-thumb {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 6px;
+  }
+  time {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .post-info h2 {
+    font-size: 1.35rem;
+    margin: 0.25rem 0 0.75rem 0;
+  }
+  .post-info h2 a {
+    color: var(--color-heading);
+  }
+  .post-info h2 a:hover {
+    color: var(--color-accent);
+  }
+  .excerpt {
+    font-size: 0.95rem;
+    color: var(--color-text);
+    margin-bottom: 1rem;
+  }
+  .read-more {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .pagination-bar {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .nav-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .page-button {
+    padding: 0.6rem 1.2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-heading);
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .page-button:hover:not(.disabled) {
+    background: var(--color-surface-hover);
+    border-color: var(--color-accent);
+  }
+  .page-button.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .page-status {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+  .page-status strong {
+    color: var(--color-heading);
+  }
+</style>
