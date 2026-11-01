@@ -17,6 +17,7 @@ const { title, description = 'Blog y contenidos de Samuel Suiri' } = Astro.props
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <meta http-equiv="Strict-Transport-Security" content="max-age=63072000; includeSubDomains; preload" />
     <title>{title}</title>
     <ClientRouter />
     <style is:global>
