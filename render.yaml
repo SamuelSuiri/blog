@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: La Bitácora del raro y bizarro Mundo de Samuel Suiri
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist

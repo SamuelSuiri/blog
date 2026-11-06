@@ -1,3 +1,5 @@
+import localPostsData from '../data/posts.json';
+
 const WP_API_BASE = import.meta.env.WP_API_URL || 'https://samsuiri.qd.je/wp-json/wp/v2';
 const STATIC_FEED_URL = import.meta.env.POSTS_FEED_URL || 'https://samsuiri.qd.je/wp-content/posts-feed.json';
 
@@ -19,7 +21,7 @@ export interface Post {
 }
 
 export async function getAllPosts(): Promise<Post[]> {
-  // 1. Intento primario de ultra-alta velocidad: Feed estático optimizado (274 entradas en 1 request)
+  // 1. Intento primario de ultra-alta velocidad: Feed estático optimizado
   try {
     const staticRes = await fetch(STATIC_FEED_URL);
     if (staticRes.ok) {
@@ -29,7 +31,7 @@ export async function getAllPosts(): Promise<Post[]> {
       }
     }
   } catch (err) {
-    console.warn('[WP] Feed estático no disponible, usando fallback paginado REST API...');
+    console.warn('[WP] Feed estático remoto no disponible, intentando REST API...');
   }
 
   // 2. Fallback resiliente paginado
@@ -50,12 +52,21 @@ export async function getAllPosts(): Promise<Post[]> {
       if (page >= totalPages) break;
       page++;
     } catch (error) {
-      console.error('Error fetching fallback posts:', error);
       break;
     }
   }
 
-  return allPosts;
+  if (allPosts.length > 0) {
+    return allPosts;
+  }
+
+  // 3. Fallback estático de seguridad: Dataset completo empaquetado (260 entradas locales)
+  if (Array.isArray(localPostsData) && localPostsData.length > 0) {
+    console.info(`[WP] Utilizando snapshot estático empaquetado (${localPostsData.length} entradas históricas garantizadas).`);
+    return localPostsData as Post[];
+  }
+
+  return [];
 }
 
 export function getRelatedPosts(currentPost: Post, allPosts: Post[], limit = 4): Post[] {
